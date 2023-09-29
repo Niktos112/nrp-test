@@ -9,7 +9,7 @@ namespace Content.Client.Preferences.UI;
 
 public sealed partial class HumanoidProfileEditor
 {
-    private TTSManager _ttsMgr = default!;
+    private IRobustRandom _random = default!;
     private TTSSystem _ttsSys = default!;
     private List<TTSVoicePrototype> _voiceList = default!;
     private readonly List<string> _sampleText = new()
@@ -22,7 +22,7 @@ public sealed partial class HumanoidProfileEditor
 
     private void InitializeVoice()
     {
-        _ttsMgr = IoCManager.Resolve<TTSManager>();
+        _random = IoCManager.Resolve<IRobustRandom>();
         _ttsSys = _entMan.System<TTSSystem>();
         _voiceList = _prototypeManager
             .EnumeratePrototypes<TTSVoicePrototype>()
@@ -35,7 +35,7 @@ public sealed partial class HumanoidProfileEditor
             _voiceButton.SelectId(args.Id);
             SetVoice(_voiceList[args.Id].ID);
         };
-            
+
         _voicePlayButton.OnPressed += _ => { PlayTTS(); };
     }
 
@@ -52,7 +52,7 @@ public sealed partial class HumanoidProfileEditor
             var voice = _voiceList[i];
             if (!HumanoidCharacterProfile.CanHaveVoice(voice, Profile.Sex))
                 continue;
-                
+
             var name = Loc.GetString(voice.Name);
             _voiceButton.AddItem(name, i);
 
@@ -80,7 +80,6 @@ public sealed partial class HumanoidProfileEditor
         if (_previewDummy is null || Profile is null)
             return;
 
-        _ttsSys.StopAllStreams();
-        _ttsMgr.RequestTTS(_previewDummy.Value, _random.Pick(_sampleText), Profile.Voice);
+        _ttsSys.RequestGlobalTTS(_random.Pick(_sampleText), Profile.Voice);
     }
 }

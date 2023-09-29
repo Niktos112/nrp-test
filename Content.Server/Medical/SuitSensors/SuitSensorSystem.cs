@@ -321,7 +321,7 @@ namespace Content.Server.Medical.SuitSensors
                 totalDamage = damageable.TotalDamage.Int();
 
             // finally, form suit sensor status
-            var status = new SuitSensorStatus(userName, userJob);
+            var status = new SuitSensorStatus(GetNetEntity(uid), userName, userJob);
             switch (sensor.Mode)
             {
                 case SuitSensorMode.SensorBinary:
@@ -353,7 +353,7 @@ namespace Content.Server.Medical.SuitSensors
                         coordinates = EntityCoordinates.Invalid;
                     }
 
-                    status.Coordinates = coordinates;
+                    status.Coordinates = GetNetCoordinates(coordinates);
                     break;
             }
 
@@ -371,6 +371,7 @@ namespace Content.Server.Medical.SuitSensors
                 [SuitSensorConstants.NET_NAME] = status.Name,
                 [SuitSensorConstants.NET_JOB] = status.Job,
                 [SuitSensorConstants.NET_IS_ALIVE] = status.IsAlive,
+                [SuitSensorConstants.NET_SUIT_SENSOR_UID] = status.SuitSensorUid,
             };
 
             if (status.TotalDamage != null)
@@ -397,16 +398,17 @@ namespace Content.Server.Medical.SuitSensors
             if (!payload.TryGetValue(SuitSensorConstants.NET_NAME, out string? name)) return null;
             if (!payload.TryGetValue(SuitSensorConstants.NET_JOB, out string? job)) return null;
             if (!payload.TryGetValue(SuitSensorConstants.NET_IS_ALIVE, out bool? isAlive)) return null;
+            if (!payload.TryGetValue(SuitSensorConstants.NET_SUIT_SENSOR_UID, out NetEntity suitSensorUid)) return null;
 
             // try get total damage and cords (optionals)
             payload.TryGetValue(SuitSensorConstants.NET_TOTAL_DAMAGE, out int? totalDamage);
-            payload.TryGetValue(SuitSensorConstants.NET_COORDINATES, out EntityCoordinates? cords);
+            payload.TryGetValue(SuitSensorConstants.NET_COORDINATES, out NetCoordinates? coords);
 
-            var status = new SuitSensorStatus(name, job)
+            var status = new SuitSensorStatus(suitSensorUid, name, job)
             {
                 IsAlive = isAlive.Value,
                 TotalDamage = totalDamage,
-                Coordinates = cords,
+                Coordinates = coords,
             };
             return status;
         }

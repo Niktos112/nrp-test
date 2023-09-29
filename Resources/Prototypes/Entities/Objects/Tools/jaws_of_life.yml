@@ -10,7 +10,6 @@
   - type: Sprite
     sprite: Objects/Tools/jaws_of_life.rsi
     state: jaws_pry
-    netsync: false
   - type: Item
     size: 50
   - type: Clothing
@@ -24,6 +23,12 @@
     qualities:
       - Prying
     speed: 1.5
+    useSound: /Audio/Items/jaws_pry.ogg
+  - type: Prying
+    pryPowered: !type:Bool
+      true
+    force: !type:Bool
+      true
     useSound: /Audio/Items/jaws_pry.ogg
   - type: ToolForcePowered
   - type: MultipleTool
